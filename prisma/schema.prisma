@@ -1,0 +1,151 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String        @id @default(cuid())
+  username     String        @unique
+  password     String
+  email        String        @unique
+  phone        String
+  address      String?
+  dateOfBirth  String?
+  role         String        @default("user") // "user" or "admin"
+  points       Int           @default(0)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  orders       Order[]
+  pointHistory PointHistory[]
+  redeemCodes  RedeemCode[]
+  redeemItems  RedeemItem[]
+}
+
+model Category {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  slug        String    @unique
+  description String?
+  order       Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  products    Product[]
+}
+
+model Product {
+  id            String      @id @default(cuid())
+  name          String
+  description   String?
+  price         Int
+  discount      Int         @default(0)
+  image         String?
+  stock         Int         @default(0)
+  categoryId    String
+  isPromotion   Boolean     @default(false)
+  isNew         Boolean     @default(false)
+  isRedeemable  Boolean     @default(false)
+  redeemPoints  Int         @default(0)
+  order         Int         @default(0)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  category      Category     @relation(fields: [categoryId], references: [id])
+  orderItems    OrderItem[]
+  redeemItems   RedeemItem[]
+}
+
+model Order {
+  id              String      @id @default(cuid())
+  userId          String
+  userName        String
+  userPhone       String
+  userAddress     String
+  total           Int
+  status          String      @default("pending") // "pending", "approved", "processing", "completed", "cancelled"
+  whatsappMessage String?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  user            User        @relation(fields: [userId], references: [id])
+  items           OrderItem[]
+  pointsEarned    Int         @default(0)
+}
+
+model OrderItem {
+  id         String      @id @default(cuid())
+  orderId    String
+  productId  String
+  quantity   Int
+  price      Int
+  subtotal   Int
+  createdAt  DateTime    @default(now())
+
+  order      Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product    Product     @relation(fields: [productId], references: [id])
+  redeemCode RedeemCode?
+}
+
+model RedeemCode {
+  id          String      @id @default(cuid())
+  code        String      @unique
+  userId      String
+  pointsUsed  Int
+  status      String      @default("active") // "active", "used"
+  usedAt      DateTime?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  user        User        @relation(fields: [userId], references: [id])
+  orderItem   OrderItem?  @relation(fields: [orderItemId], references: [id])
+  orderItemId String?     @unique
+  redeemItem  RedeemItem? @relation(fields: [redeemItemId], references: [id])
+  redeemItemId String?    @unique
+}
+
+model PointHistory {
+  id           String      @id @default(cuid())
+  userId       String
+  type         String      // "earned", "redeemed", or "exchanged"
+  points       Int
+  description  String?
+  orderId      String?
+  redeemCodeId String?
+  createdAt    DateTime    @default(now())
+
+  user         User        @relation(fields: [userId], references: [id])
+}
+
+model RedeemItem {
+  id           String      @id @default(cuid())
+  userId       String
+  productId    String
+  pointsUsed   Int
+  createdAt    DateTime    @default(now())
+
+  user         User        @relation(fields: [userId], references: [id])
+  product      Product     @relation(fields: [productId], references: [id])
+  redeemCode   RedeemCode?
+}
+
+model ShopProfile {
+  id            String      @id @default(cuid())
+  storeName     String      @default("AYAM GEPREK SAMBAL IJO")
+  slogan        String      @default("Sambal Pedas Mantap")
+  whatsapp      String      @default("6285260812758")
+  instagram     String?
+  facebook      String?
+  address       String?
+  operatingHours String     @default("Senin - Minggu\n10:00 - 22:00 WIB")
+  logo          String?
+  updatedAt     DateTime    @updatedAt
+  createdAt     DateTime    @default(now())
+}
