@@ -690,6 +690,45 @@ Laporan ini dicetak pada: ${date}
 
   const handleAcceptOrder = async (orderId: string) => {
     try {
+      // Find the order in onlineOrders
+      const order = onlineOrders.find(o => o.id === orderId)
+      if (!order) {
+        toast.error('Pesanan tidak ditemukan')
+        return
+      }
+
+      // Add order items to cart
+      setCart((prevCart) => {
+        let updatedCart = [...prevCart]
+
+        order.items.forEach((orderItem) => {
+          const existingItem = updatedCart.find((item) => item.product.id === orderItem.productId)
+          const currentQuantity = existingItem ? existingItem.quantity : 0
+          const newQuantity = currentQuantity + orderItem.quantity
+
+          if (existingItem) {
+            updatedCart = updatedCart.map((item) =>
+              item.product.id === orderItem.productId
+                ? {
+                    ...item,
+                    quantity: newQuantity,
+                    subtotal: newQuantity * item.product.price
+                  }
+                : item
+            )
+          } else {
+            updatedCart.push({
+              product: orderItem.product,
+              quantity: orderItem.quantity,
+              subtotal: orderItem.subtotal
+            })
+          }
+        })
+
+        return updatedCart
+      })
+
+      // Update order status to processing
       const res = await fetch(`/api/orders/${orderId}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
@@ -697,7 +736,9 @@ Laporan ini dicetak pada: ${date}
       })
 
       if (res.ok) {
-        toast.success('Pesanan diterima')
+        toast.success(`Pesanan #${orderId.slice(-6).toUpperCase()} ditambahkan ke keranjang`, {
+          description: `${order.items.length} item ditambahkan`
+        })
         await fetchOnlineOrders()
         await checkOnlineOrders()
       } else {
@@ -1293,7 +1334,7 @@ Laporan ini dicetak pada: ${date}
                                 onClick={() => handleAcceptOrder(order.id)}
                               >
                                 <CheckCircle className="w-4 h-4 mr-2" />
-                                Terima Pesanan
+                                Ambil ke Keranjang
                               </Button>
                             </CardContent>
                           </Card>
