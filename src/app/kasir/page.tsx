@@ -837,12 +837,12 @@ Laporan ini dicetak pada: ${date}
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="container mx-auto px-4 py-6 relative min-h-[calc(100vh-240px)]">
-        {/* Product Grid */}
-        <div className="pr-[440px]">
+      {/* Main Content - 2 Column Layout */}
+      <main className="container mx-auto px-4 py-6 flex gap-6 min-h-[calc(100vh-240px)]">
+        {/* Left Column - Products (Scrollable) */}
+        <div className="flex-1 flex flex-col gap-4 min-w-0 overflow-y-auto pr-2">
           {/* Search and Filter */}
-          <div className="flex gap-4 flex-wrap mb-6">
+          <div className="flex gap-4 flex-wrap mb-6 sticky top-0 bg-gradient-to-br from-orange-50 via-white to-orange-50 z-10 py-2">
             <div className="relative flex-1 min-w-[200px]">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
               <Input
@@ -949,122 +949,125 @@ Laporan ini dicetak pada: ${date}
           )}
         </div>
 
-        {/* Shopping Cart - Fixed on Right Side */}
-        <motion.div
-          initial={{ x: 300, opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-          transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-          className="fixed right-4 top-[180px] bottom-[120px] w-[420px] flex flex-col gap-4 z-30"
-        >
-          <Card className="border-orange-100 shadow-lg flex flex-col h-full max-h-[calc(100vh-280px)]">
-            <CardHeader className="bg-gradient-to-r from-orange-500 to-orange-600 text-white flex-shrink-0 py-4">
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <ShoppingCart className="w-5 h-5" />
-                Keranjang
-                {cart.length > 0 && (
-                  <Badge variant="secondary" className="ml-auto text-sm">
-                    {cart.length}
-                  </Badge>
-                )}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-4 flex-1 flex flex-col overflow-hidden">
-              <div className="flex-1 overflow-y-auto pr-2">
-                {cart.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center h-full text-gray-400 min-h-[250px]">
-                    <ShoppingBag className="w-12 h-12 mb-2" />
-                    <p className="text-sm">Keranjang kosong</p>
-                  </div>
-                ) : (
-                  <div className="space-y-3 pb-3">
-                    {cart.map((item) => (
-                      <motion.div
-                        key={item.product.id}
-                        layout
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="flex gap-3 p-3 bg-orange-50 rounded-lg"
-                      >
-                        {item.product.image && (
-                          <img
-                            src={item.product.image}
-                            alt={item.product.name}
-                            className="w-18 h-18 object-cover rounded-md flex-shrink-0"
-                          />
-                        )}
-                        <div className="flex-1 min-w-0">
-                          <h4 className="font-medium text-sm text-gray-800 line-clamp-1">{item.product.name}</h4>
-                          <p className="text-sm text-orange-600 font-bold mt-1">
-                            Rp {item.subtotal.toLocaleString('id-ID')}
-                          </p>
-                          <div className="flex items-center gap-2 mt-2">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="h-8 w-8 p-0 border-orange-200"
-                              onClick={() => updateQuantity(item.product.id, -1)}
-                            >
-                              <Minus className="w-4 h-4" />
-                            </Button>
-                            <span className="text-sm font-medium w-10 text-center">{item.quantity}</span>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="h-8 w-8 p-0 border-orange-200"
-                              onClick={() => updateQuantity(item.product.id, 1)}
-                            >
-                              <Plus className="w-4 h-4" />
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              className="h-8 w-8 p-0 text-red-500 hover:text-red-700 hover:bg-red-50 ml-auto"
-                              onClick={() => removeFromCart(item.product.id)}
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
+        {/* Right Column - Cart/Checkout (Fixed) */}
+        <div className="w-[420px] flex flex-col gap-4 shrink-0">
+          <motion.div
+            initial={{ x: 300, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+            className="sticky top-0"
+          >
+            <Card className="border-orange-100 shadow-lg flex flex-col max-h-[calc(100vh-280px)]">
+              <CardHeader className="bg-gradient-to-r from-orange-500 to-orange-600 text-white flex-shrink-0 py-4">
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <ShoppingCart className="w-5 h-5" />
+                  Keranjang
+                  {cart.length > 0 && (
+                    <Badge variant="secondary" className="ml-auto text-sm">
+                      {cart.length}
+                    </Badge>
+                  )}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-4 flex-1 flex flex-col overflow-hidden">
+                <div className="flex-1 overflow-y-auto pr-2">
+                  {cart.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center h-full text-gray-400 min-h-[300px]">
+                      <ShoppingBag className="w-16 h-16 mb-3" />
+                      <p className="text-sm">Keranjang kosong</p>
+                      <p className="text-xs text-gray-500 mt-1">Tambahkan produk untuk memulai pesanan</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3 pb-3">
+                      {cart.map((item) => (
+                        <motion.div
+                          key={item.product.id}
+                          layout
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                          className="flex gap-3 p-3 bg-orange-50 rounded-lg border border-orange-200"
+                        >
+                          {item.product.image && (
+                            <img
+                              src={item.product.image}
+                              alt={item.product.name}
+                              className="w-20 h-20 object-cover rounded-lg flex-shrink-0"
+                            />
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <h4 className="font-semibold text-sm text-gray-800 line-clamp-1">{item.product.name}</h4>
+                            <p className="text-sm text-orange-600 font-bold mt-1">
+                              Rp {item.subtotal.toLocaleString('id-ID')}
+                            </p>
+                            <div className="flex items-center gap-2 mt-2">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="h-8 w-8 p-0 border-orange-200"
+                                onClick={() => updateQuantity(item.product.id, -1)}
+                              >
+                                <Minus className="w-4 h-4" />
+                              </Button>
+                              <span className="text-sm font-medium w-10 text-center">{item.quantity}</span>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="h-8 w-8 p-0 border-orange-200"
+                                onClick={() => updateQuantity(item.product.id, 1)}
+                              >
+                                <Plus className="w-4 h-4" />
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                className="h-8 w-8 p-0 text-red-500 hover:text-red-700 hover:bg-red-50 ml-auto"
+                                onClick={() => removeFromCart(item.product.id)}
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </div>
                           </div>
-                        </div>
-                      </motion.div>
-                    ))}
+                        </motion.div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <Separator className="my-4 flex-shrink-0" />
+
+                <div className="space-y-2 flex-shrink-0">
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-gray-600">Subtotal</span>
+                    <span className="font-medium">Rp {getCartTotal().toLocaleString('id-ID')}</span>
                   </div>
-                )}
-              </div>
-
-              <Separator className="my-4 flex-shrink-0" />
-
-              <div className="space-y-2 flex-shrink-0">
-                <div className="flex justify-between items-center text-sm">
-                  <span className="text-gray-600">Subtotal</span>
-                  <span className="font-medium">Rp {getCartTotal().toLocaleString('id-ID')}</span>
+                  <div className="flex justify-between items-center text-lg font-bold">
+                    <span className="text-gray-800">Total</span>
+                    <span className="text-orange-600">Rp {getCartTotal().toLocaleString('id-ID')}</span>
+                  </div>
                 </div>
-                <div className="flex justify-between items-center text-lg font-bold">
-                  <span className="text-gray-800">Total</span>
-                  <span className="text-orange-600">Rp {getCartTotal().toLocaleString('id-ID')}</span>
-                </div>
-              </div>
 
-              <Button
-                className="w-full mt-4 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-base py-4 flex-shrink-0"
-                disabled={cart.length === 0 || processingOrder}
-                onClick={() => setShowPaymentModal(true)}
-              >
-                {processingOrder ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    Memproses...
-                  </>
-                ) : (
-                  <>
-                    <CreditCard className="w-5 h-5 mr-2" />
-                    Bayar
-                  </>
-                )}
-              </Button>
-            </CardContent>
-          </Card>
-        </motion.div>
+                <Button
+                  className="w-full mt-4 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-base py-4 flex-shrink-0"
+                  disabled={cart.length === 0 || processingOrder}
+                  onClick={() => setShowPaymentModal(true)}
+                >
+                  {processingOrder ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      Memproses...
+                    </>
+                  ) : (
+                    <>
+                      <CreditCard className="w-5 h-5 mr-2" />
+                      Bayar
+                    </>
+                  )}
+                </Button>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </div>
       </main>
 
       {/* Footer */}
