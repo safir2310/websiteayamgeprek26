@@ -797,7 +797,7 @@ Laporan ini dicetak pada: ${date}
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 container mx-auto px-4 py-6 flex gap-6 min-h-[calc(100vh-420px)]">
+      <main className="flex-1 container mx-auto px-4 py-6 flex gap-6 min-h-[calc(100vh-240px)]">
         {/* Product Grid */}
         <div className="flex-1 flex flex-col gap-4">
           {/* Search and Filter */}
@@ -913,7 +913,7 @@ Laporan ini dicetak pada: ${date}
           initial={{ x: 300, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-          className="w-[480px] flex flex-col gap-4 min-h-[calc(100vh-420px)]"
+          className="w-[480px] flex flex-col gap-4 min-h-[calc(100vh-240px)]"
         >
           <Card className="border-orange-100 shadow-lg h-full flex flex-col">
             <CardHeader className="bg-gradient-to-r from-orange-500 to-orange-600 text-white flex-shrink-0">
