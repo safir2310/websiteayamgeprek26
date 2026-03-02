@@ -1,0 +1,25 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { db } from '@/lib/db'
+
+export async function GET(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url)
+    const userId = searchParams.get('userId')
+
+    if (!userId) {
+      return NextResponse.json({ error: 'User ID wajib diisi' }, { status: 400 })
+    }
+
+    const pointHistory = await db.pointHistory.findMany({
+      where: { userId },
+      orderBy: {
+        createdAt: 'desc'
+      }
+    })
+
+    return NextResponse.json(pointHistory)
+  } catch (error) {
+    console.error('Fetch point history error:', error)
+    return NextResponse.json({ error: 'Terjadi kesalahan' }, { status: 500 })
+  }
+}
